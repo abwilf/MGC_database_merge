@@ -50,7 +50,7 @@ def create_db(new_dev, new_alumni, new_campaign, to_find_title):
     c.execute("drop table if exists campaign")
     os.system("csvsql --db sqlite:///db.sqlite3 --table campaign --insert " + new_campaign)
     c.execute("drop table if exists alums_to_find")
-    os.system("csvsql --db sqlite:///db.sqlite3 --table alums_to_find --insert " + to_find)
+    os.system("csvsql --db sqlite:///db.sqlite3 --table alums_to_find --insert " + to_find_title)
     print("Done\n")
     return c
 
