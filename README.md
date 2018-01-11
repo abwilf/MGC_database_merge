@@ -27,7 +27,7 @@ pip install -r
 **FIXME**
 
 ### Business Team
-To manage the inventory database, you'll need to access functions in `csv_db.py`.  The relevant functions you'll use are below.  For a full example, scroll down or [click here] **LINK FIXME**()
+To manage the inventory database, you'll need to access functions in `csv_db.py`.  The relevant functions you'll use are below.  For a full example, scroll down or [click here](https://github.com/abwilf/MGC_database_merge#full-example)
 
 #### Generate Database
 ```python
