@@ -1,6 +1,14 @@
+# Men's Glee Club Database Merge Script
+## Description and Motivation
+An easy to use computer utility that takes in excel documents from SMTD's development office and the MGC alumni database, merges them, and returns a new excel file.
 
+This is important because having an up to date database is critical for student-alumni engagement efforts.  The Club cannot simply copy development's database every month, however, because it needs to keep its own data (i.e. who was in the Friars, tour information, executive board positions held...etc).  Additionally, no database system should be implemented in anything more complicated than excel because (1) the development office only sends us excel files and (2) not every Alumni Relations Manager is a Computer Science major and the risk exists that a future Club will abandon our database altogether if it is too confusing to operate (as occurred in 2014), leading to lost data about our alumni.
 
-## Install prerequisites
+Due to these constraints, we need a database that has the operational capability of a complex database system, but the ease of use and access of an excel file.  That is the purpose of this project.
+
+It is worth noting that in pursuit of this goal, some intermediary functionalities were necessary, namely code that converts between database languages and excel, and command line utilities processing queries into those databases.  These functionalities turned out to be important to other branches of Club as well, so some of their functionalities may be ported to different projects.  Details on this, installation, and examples are below.
+
+## Installing the prerequisites
 
 
 #### Windows
@@ -21,13 +29,13 @@ pip install -r
 ```
 
 
-## Run the scripts
+## Running the scripts
 
 ### Alumni Relations Manager
 **FIXME**
 
 ### Business Team
-To manage the inventory database, you'll need to access functions in `csv_db.py`.  The relevant functions you'll use are below.  For a full example, scroll down or [click here](https://github.com/abwilf/MGC_database_merge#full-example)
+To manage the inventory database, you'll need to access functions in `csv_db.py`.  The relevant functions you'll use are below.  For a full example, scroll down or [click here](https://github.com/abwilf/MGC_database_merge#full-example).
 
 #### Generate Database
 ```python
@@ -94,8 +102,6 @@ csv_db.query("select * from test1", cursor, file_out="blah.csv")
    ```
 
 2. In terminal, run `python3 example.py` to see this in action.
-
-   You should see something like this:
 
    ```
    $ python3 example.py
