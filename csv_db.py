@@ -23,7 +23,7 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
-# R: array of input_files = [<filename>.csv], dbname (optional)
+# R: array of input_files = [<filename>.csv], dbname (optional), if files being inputted are in xlsx format or not
 # E: returns db cursor with dbname, having incorporated input files to db with <filename> as table name
 def gen_db(input_files, dbname="db", excel=False):
     # convert to csv if necessary
@@ -55,14 +55,14 @@ def write_to_csv(fieldnames, filename, result):
             writer.writerow(row)
 
 
-# R: query text (in SQL format)
-#    database cursor: i.e. return value of gen_db
-#    cmnd_line: do you want it to print to the command line?  by default it prints results to a csv
-#    file_out - specify the filename you would like to write to - defaults to "out.csv"
+# Requires: query text (in SQL format)
+#    database cursor (the return value of gen_db)
+#    cmnd_line: do you want it to print to the command line? True or False. By default the function prints results to a csv
+#    file_out: If not printing to command line, specify the filename you would like to write to - defaults to "out.csv"
 #
-# M: db.sqlite3 (or whatever db cursor is connected to)
+# Modifies: db.sqlite3 (or whatever db cursor is connected to)
 #
-# E: always returns results as python object for programmer
+# Effects: always returns results as python object for programmer
 #    if cmnd_line, returns results on command line
 #    else, prints results to file_out in csv format
 def query(text, cursor, cmnd_line=False, file_out="out.csv"):
