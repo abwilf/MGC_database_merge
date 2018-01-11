@@ -12,47 +12,7 @@ def write_to_csv(fieldnames, filename, result):
         for row in result:
             writer.writerow(row)
 
-# c == cursor
-def find_missing_alumni(c):
-    result = c.execute("select FIRST_NAME, LAST_NAME, EMAIL, EMAIL_2, GRAD_YEAR_1 from alumni where EMAIL in (select email from campaign) OR EMAIL_2 in (select email from campaign)").fetchall()
-    fieldnames = ["FIRST_NAME", "LAST_NAME", "EMAIL", "EMAIL_2", "GRAD_YEAR", "GRAD_YEAR_1"]
-    filename = 'campaign_names_found.csv'
-    write_to_csv(fieldnames, filename, result)
-    temp = c.execute("select EMAIL from alumni")
-    result = c.execute("select * from campaign WHERE NOT (email in ?)", temp)
 
-def dict_factory(cursor, row):
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
-
-def create_csvs(dev_title, alumni_title, campaign_title, new_dev, new_alumni, new_campaign):
-    print("\n\nCreating csv's from excel sheets...")
-    os.system("in2csv " + dev_title + " > " + new_dev)
-    os.system("in2csv " + alumni_title + " > " + new_alumni)
-    os.system("in2csv " + campaign_title + " > " + new_campaign)
-    print("Done\n")
-    return {"new_dev": new_dev, "new_alumni": new_alumni, "new_campaign": new_campaign}
-
-def create_db(new_dev, new_alumni, new_campaign, to_find_title):
-    print("Creating and populating database from csv files...")
-    # create and populate db
-    os.system("sqlite3 db.sqlite3")   
-    conn = sqlite3.connect("db.sqlite3")
-    conn.text_factory = bytes
-    conn.row_factory = dict_factory
-    c = conn.cursor()
-    c.execute("drop table if exists alumni")
-    os.system("csvsql --db sqlite:///db.sqlite3 --table alumni --insert " + new_alumni)
-    c.execute("drop table if exists dev")
-    os.system("csvsql --db sqlite:///db.sqlite3 --table dev --insert " + new_dev)
-    c.execute("drop table if exists campaign")
-    os.system("csvsql --db sqlite:///db.sqlite3 --table campaign --insert " + new_campaign)
-    c.execute("drop table if exists alums_to_find")
-    os.system("csvsql --db sqlite:///db.sqlite3 --table alums_to_find --insert " + to_find_title)
-    print("Done\n")
-    return c
 
 @click.command()
 @click.option('--dev_title', prompt="Hello!  ENTER DEV DATA PLZ")

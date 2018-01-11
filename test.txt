@@ -1,6 +1,0 @@
-DEV_copy.xlsx
-ALUMNI_copy.xlsx
-campaign_copy.xlsx
-alums_to_find.csv
-yes
-find_alumni
