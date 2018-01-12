@@ -59,17 +59,16 @@ cursor = csv_db.gen_db(["test1.csv"])
 ```python
 # Requires: query text (in SQL format)
 #    database cursor (the return value of gen_db)
-#    cmnd_line (optional): Do you want it to print to the command line? True or False. 
-#       By default the function prints results to a csv
-#    file_out (optional): If not printing to command line, specify the filename
-#        you would like to write to - defaults to "out.csv"
+#    print: do you want it to print anything (to csv or command line?) Default=True
+#    cmnd_line: do you want it to print to the command line? True or False. By default the function prints results to a csv
+#    file_out: If not printing to command line, specify the filename you would like to write to - defaults to "out.csv"
 #
 # Modifies: db.sqlite3 (or whatever db cursor is connected to)
 #
 # Effects: always returns results as python object for programmer
 #    if cmnd_line, returns results on command line
 #    else, prints results to file_out in csv format
-def query(text, cursor, cmnd_line=False, file_out="out.csv"):
+def query(text, cursor, print=True, cmnd_line=False, file_out="out.csv"):
 ```
 ##### Example 1
 This code executes a query on the database passed in by `cursor`, the return value of `gen_db()`.  The first parameter is text in SQL format.  The second is the cursor variable.  The third specifies that the user would like to print the results of the query to the command line.  Since the user specified `cmnd_line=True`, there is no need to specify `file_out`, since the program will print to the command line instead of a csv file.

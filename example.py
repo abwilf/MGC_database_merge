@@ -1,3 +1,4 @@
 import csv_db
-cursor = csv_db.gen_db(["test1.xlsx", "test2.xlsx"], dbname="hey", excel=True)
-csv_db.query("select * from test1", cursor)
+cursor = csv_db.gen_db(["ALUMNI_CLEANED.xlsx"], dbname="hey", excel=True)
+query = "select * from ALUMNI_CLEANED where dev_id=2487861"
+csv_db.query(query, cursor)

@@ -57,6 +57,7 @@ def write_to_csv(fieldnames, filename, result):
 
 # Requires: query text (in SQL format)
 #    database cursor (the return value of gen_db)
+#    print: do you want it to print anything (to csv or command line?) Default=True
 #    cmnd_line: do you want it to print to the command line? True or False. By default the function prints results to a csv
 #    file_out: If not printing to command line, specify the filename you would like to write to - defaults to "out.csv"
 #
@@ -65,7 +66,7 @@ def write_to_csv(fieldnames, filename, result):
 # Effects: always returns results as python object for programmer
 #    if cmnd_line, returns results on command line
 #    else, prints results to file_out in csv format
-def query(text, cursor, cmnd_line=False, file_out="out.csv"):
+def query(text, cursor, print=True, cmnd_line=False, file_out="out.csv"):
     res = cursor.execute(text).fetchall()
 
     tempres = []
@@ -74,7 +75,7 @@ def query(text, cursor, cmnd_line=False, file_out="out.csv"):
         fieldnames = list(res[0].keys())
         # deal with byte encoding problem
         for elt in res:
-            tempres.append({k: v.decode('UTF-8') for k, v in elt.items()})
+            tempres.append({k: (v.decode('UTF-8') if type(v) == bytes else v) for k, v in elt.items()})
     res = tempres
 
     if cmnd_line:
