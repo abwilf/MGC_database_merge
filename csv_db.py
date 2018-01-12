@@ -78,17 +78,18 @@ def query(text, cursor, print=True, cmnd_line=False, file_out="out.csv"):
             tempres.append({k: (v.decode('UTF-8') if type(v) == bytes else v) for k, v in elt.items()})
     res = tempres
 
-    if cmnd_line:
-        print('\n******* QUERY RESULT *******')
-        for elt in fieldnames:
-            print(elt, end="\t")
-        print() #\n
+    if print:
+        if cmnd_line:
+            print('\n******* QUERY RESULT *******')
+            for elt in fieldnames:
+                print(elt, end="\t")
+            print() #\n
 
-        for elt in res:
-            for key, val in elt.items():
-                print(val, end="\t")
-            print()
-    else:
-        write_to_csv(fieldnames, file_out, res)
+            for elt in res:
+                for key, val in elt.items():
+                    print(val, end="\t")
+                print()
+        else:
+            write_to_csv(fieldnames, file_out, res)
 
     return res
