@@ -4,9 +4,9 @@ An easy to use computer utility that takes in excel documents from SMTD's develo
 
 This is important because having an up to date database is critical for student-alumni engagement efforts.  The Club cannot simply copy development's database every month, however, because it needs to keep its own data (i.e. who was in the Friars, tour information, executive board positions held...etc).  Additionally, no database system should be implemented in anything more complicated than excel because (1) the development office only sends us excel files and (2) not every Alumni Relations Manager is a Computer Science major and the risk exists that a future Club will abandon our database altogether if it is too confusing to operate (as occurred in 2014), leading to lost data about our alumni.
 
-Due to these constraints, we need a database that has the operational capability of a complex database system, but the ease of use and access of an excel file.  That is the purpose of this project.
+Due to these constraints, we need a database that has the operational capability of a complex database system, but the ease of use and access of an excel file.  Bridging that gap is the purpose of this project.
 
-It is worth noting that in pursuit of this goal, some intermediary functionalities were necessary, namely code that converts between database languages and excel, and command line utilities processing queries into those databases.  These functionalities turned out to be important to other branches of Club as well, so some of their functionalities may be ported to different projects.  Details on this, installation, and examples are below.
+It is worth noting that in pursuit of this goal, some intermediary functionalities were necessary to implement, for example code that converts between database languages and excel, and command line utilities processing queries into those databases.  These functionalities turned out to be important to other branches of Club as well, so some of their functionalities may be ported to different projects.  Details on this, the project's installation, and examples to get you started are below.
 
 ## Installing the prerequisites
 
@@ -15,15 +15,19 @@ It is worth noting that in pursuit of this goal, some intermediary functionaliti
 **FIXME**
 
 #### Mac
-Copy and paste this into terminal (it may take a while)
+If you don't have `homebrew`, `git`, `pip`, or `python3` installed, copy and paste this into terminal (it may take a while).
 ```
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 brew update
 brew install git
-cd ~/Desktop
-git clone https://github.com/abwilf/MGC_database_merge.git
 brew install pip
 brew install python3
+```
+
+Now that the dependencies have been installed, copy and paste the following.  This copies the code base onto your computer and installs python packages required to run it.
+```
+cd ~/Desktop/
+git clone https://github.com/abwilf/MGC_database_merge.git
 pip install -r
 
 ```
@@ -39,8 +43,8 @@ To manage the inventory database, you'll need to access functions in `csv_db.py`
 
 #### Generate Database
 ```python
-# Requires: array of input_files = [<filename>.csv], dbname (optional), excel: if files being inputted are in xlsx format or not (True/False)
-# Effects: returns db cursor with dbname, having incorporated input files to db with <filename> as table name
+# Requires: array of input_files = [<filename>.csv or <filename>.xlsx], dbname (optional), excel: if files being inputted are in xlsx format or not (True/False)
+# Effects: returns db cursor (this is how we'll access the database later) with dbname, having incorporated input files to db with <filename>s as table names
 def gen_db(input_files, dbname="db", excel=False):
 ```
 ##### Example 1
@@ -59,7 +63,7 @@ cursor = csv_db.gen_db(["test1.csv"])
 ```python
 # Requires: query text (in SQL format)
 #    database cursor (the return value of gen_db)
-#    print: do you want it to print anything (to csv or command line?) Default=True
+#    print: do you want it to print anything? (to csv or command line). Default=True
 #    cmnd_line: do you want it to print to the command line? True or False. By default the function prints results to a csv
 #    file_out: If not printing to command line, specify the filename you would like to write to - defaults to "out.csv"
 #
