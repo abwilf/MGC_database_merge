@@ -21,12 +21,6 @@ def create_csvs(input_files):
 
     return to_ret
 
-def dict_factory(cursor, row):
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
-
 
 def create_db(dbname, conn):
     print("Creating database \""+dbname+"\"")
@@ -108,7 +102,7 @@ def write_to_csv(rows, filename):
 #    cmnd_line: do you want it to print to the command line? True or False. By default the function prints results to a csv
 #    file_out: If not printing to command line, specify the filename you would like to write to - defaults to "out.csv"
 #
-# Modifies: db.sqlite3 (or whatever db cursor is connected to)
+# Modifies: db (wherever cursor is connected)
 #
 # Effects: always returns results as python object for programmer
 #    if cmnd_line, returns results on command line

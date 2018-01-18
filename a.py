@@ -8,7 +8,7 @@ import csv_db
 # text = "select exists(SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('" + dbname + "'));"
 
 cur = csv_db.gen_db(['x.csv'], dbname="heya")
-csv_db.query("select * from x;", cur, cmnd_line=True)
+csv_db.query("select * from x;", cur)
 
 # text = "select * from a;"
 # csv_db.query(text, cur, cmnd_line=True)
