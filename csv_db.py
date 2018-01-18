@@ -1,7 +1,11 @@
-import sqlite3
+import psycopg2
 import sys
 import os
 import csv
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+import pandas as pd
+import numpy as np
+from sqlalchemy import create_engine
 
 
 # R: [<filename>.xlsx]
@@ -23,36 +27,79 @@ def dict_factory(cursor, row):
         d[col[0]] = row[idx]
     return d
 
+
+def create_db(dbname, conn):
+    print("Creating database \""+dbname+"\"")
+    text = "create database " + dbname
+    cur = conn.cursor()
+    cur.execute(text)
+    conn = psycopg2.connect(host="localhost",database=dbname, user="postgres", password="postgres")
+    cur = conn.cursor()
+    return cur
+
+
 # R: array of input_files = [<filename>.csv], dbname (optional), if files being inputted are in xlsx format or not
 # E: returns db cursor with dbname, having incorporated input files to db with <filename> as table name
-def gen_db(input_files, dbname="db", excel=False):
-    # convert to csv if necessary
-    if excel:
-        input_files = create_csvs(input_files)
+def gen_db(input_files=[], dbname="db", excel=False):    
+    conn = psycopg2.connect(host="localhost", user="postgres", password="postgres")
+    conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+    cur = conn.cursor()
+    text = "select exists(SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('" + dbname + "'));"
+    db_exists = query(text, cur, print_out=False)[0][0]
 
-    print("Creating and populating database from csv files...")
+    # if not db, ask and create or exit
+    if not db_exists:
+        dbs = [x[0] for x in query("select datname from pg_catalog.pg_database", cur, print_out=False)]
+        input_text = "*** NOTE ***\nYou're trying to connect to a database called \""+ dbname + "\", which does not exist.\n"
+        input_text +=  "The following databases exist on your system: "
+        for x in dbs:
+            input_text += x + ', '
+        input_text.rstrip(', ')
+        input_text += "\nDo you want to create a new database named \"" + dbname + "\"? [y] or [n]\n"
+        user_input = input(input_text)
+
+        if user_input=='n':
+            print('Exiting the program.  Please specify an existing database name in the python code, or choose to create one next time around.\n')
+            exit()
+        else: # create db
+            # testing
+            # print("SHOULD BE FALSE: " + query("select exists(SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('" + dbname + "'));", cur, print_out=False)[0][0])
+            cur = create_db(dbname, conn)
+
+    # else (db exists), ask if they want to overwrite it with csvs or exit
+    else:
+        s = input("\"" + dbname + "\" already exists.  Do you want to overwrite it with the csv's you entered? [y] or [n]\n")
+        if s == 'n':
+            print("\nExiting the program.  Next time around, either choose to overwrite the database or choose an unused database name.")
+            print("Database names in use: ")
+            for x in query("select datname from pg_catalog.pg_database", cur, print_out=False):
+                print(x[0], end="\t")
+            print()
+            exit()
+        else:
+            # drop and regenerate database
+            print("Dropping database \"" + dbname + "\"")
+            cur.execute("drop database if exists " + dbname)
+            cur = create_db(dbname, conn)
     
-    # create and populate db
-    conn = sqlite3.connect(dbname + ".sqlite3")
-    conn.text_factory = bytes
-    conn.row_factory = dict_factory
-    c = conn.cursor()
-    
+    # populate db with csvs using pandas
+    print("Populating database from csv files...")
+    if excel:
+        input_files = create_csvs(input_files)  
+
+    engine = create_engine('postgresql+psycopg2://postgres:postgres@localhost/' + dbname)
     for input_file in input_files:
-        file = input_file.split('.')[0]
-        c.execute("drop table if exists " + file)
-        os.system("csvsql --db sqlite:///" + dbname + ".sqlite3 --table " + file + " --insert " + input_file)
+        df = pd.read_csv(input_file)
+        df.to_sql(input_file.split('.')[0], engine)
 
     print("Done")
-    return c
+    return cur
 
 
-def write_to_csv(fieldnames, filename, result):
+def write_to_csv(rows, filename):
     with open(filename, 'w') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        for row in result:
-            writer.writerow(row)
+        writer = csv.writer(csvfile)
+        writer.writerows(rows)
 
 
 # Requires: query text (in SQL format)
@@ -66,30 +113,31 @@ def write_to_csv(fieldnames, filename, result):
 # Effects: always returns results as python object for programmer
 #    if cmnd_line, returns results on command line
 #    else, prints results to file_out in csv format
-def query(text, cursor, print=True, cmnd_line=False, file_out="out.csv"):
-    res = cursor.execute(text).fetchall()
+def query(text, cursor, print_out=True, cmnd_line=False, file_out="out.csv"):
+    cursor.execute(text)
+    colnames = [col.name for col in cursor.description]
+    res = cursor.fetchall()
 
-    tempres = []
-
-    if res:
-        fieldnames = list(res[0].keys())
-        # deal with byte encoding problem
-        for elt in res:
-            tempres.append({k: (v.decode('UTF-8') if type(v) == bytes else v) for k, v in elt.items()})
-    res = tempres
+    # tempres = []
+    # if res:
+    #     # fieldnames = list(res[0].keys())
+    #     # deal with byte encoding problem
+    #     for elt in res:
+    #         tempres.append({k: (v.decode('UTF-8') if type(v) == bytes else v) for k, v in elt.items()})
+    # res = tempres
 
     if print:
         if cmnd_line:
             print('\n******* QUERY RESULT *******')
-            for elt in fieldnames:
+            for elt in colnames:
                 print(elt, end="\t")
             print() #\n
 
             for elt in res:
-                for key, val in elt.items():
-                    print(val, end="\t")
+                for sub_elt in elt:
+                    print(sub_elt, end="\t")
                 print()
         else:
-            write_to_csv(fieldnames, file_out, res)
+            write_to_csv([colnames] + res, file_out)
 
     return res
