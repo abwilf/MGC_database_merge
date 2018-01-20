@@ -95,6 +95,11 @@ def write_to_csv(rows, filename):
         writer = csv.writer(csvfile)
         writer.writerows(rows)
 
+# Requires: dbname must be a database in postgres on this machine, postgres must be running (brew services start postgres),
+# must have user and superuser privileges for postgres, postgres == (username, password)
+# Effects: returns cursor connected to postgreSQL database <dbname>
+def connect(dbname):
+    return psycopg2.connect(host="localhost", database=dbname, user="postgres", password="postgres").cursor()
 
 # Requires: query text (in SQL format)
 #    database cursor (the return value of gen_db)
@@ -107,10 +112,16 @@ def write_to_csv(rows, filename):
 # Effects: always returns results as python object for programmer
 #    if cmnd_line, returns results on command line
 #    else, prints results to file_out in csv format
-def query(text, cursor, print_out=True, cmnd_line=False, file_out="out.csv"):
+def query(text, cursor, print_out=True, cmnd_line=False, file_out="out.csv", result=True):
+    # if print_out and not cursor.description:
+    #     text_print = """ERROR: Problem in query function: you asked the function to print the results but you didn't give it a
+    #         SQL query that it could print something from.  Example: 'update one set a=4;'.
+    #         This doesn't return anything to print.  If you want to do this with an 'update'
+    #         statement, check out the SQL 'returning' statement online, or specify print_out=False\n\nExiting program now."""
+    #     exit(text_print)
     cursor.execute(text)
-    colnames = [col.name for col in cursor.description]
-    res = cursor.fetchall()
+    if result:
+        res = cursor.fetchall()
 
     # tempres = []
     # if res:
@@ -120,7 +131,8 @@ def query(text, cursor, print_out=True, cmnd_line=False, file_out="out.csv"):
     #         tempres.append({k: (v.decode('UTF-8') if type(v) == bytes else v) for k, v in elt.items()})
     # res = tempres
 
-    if print:
+    if print_out:
+        colnames = [col.name for col in cursor.description]
         if cmnd_line:
             print('\n******* QUERY RESULT *******')
             for elt in colnames:
@@ -133,5 +145,5 @@ def query(text, cursor, print_out=True, cmnd_line=False, file_out="out.csv"):
                 print()
         else:
             write_to_csv([colnames] + res, file_out)
-
-    return res
+    if result:
+        return res

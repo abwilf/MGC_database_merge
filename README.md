@@ -1,4 +1,13 @@
 # Men's Glee Club Database Merge Script
+#### Table of Contents
+[Description and Motivation](https://github.com/abwilf/MGC_database_merge#description-and-motivation)
+
+[Installing the Prerequisites](https://github.com/abwilf/MGC_database_merge#installing-the-prerequisites)
+
+[Running the Scripts](https://github.com/abwilf/MGC_database_merge#running-the-scripts)
+
+[FAQ](https://github.com/abwilf/MGC_database_merge#FAQ)
+
 ## Description and Motivation
 An easy to use computer utility that takes in excel documents from SMTD's development office and the MGC alumni database, merges them, and returns a new excel file.
 
@@ -9,11 +18,6 @@ Due to these constraints, we need a database that has the operational capability
 It is worth noting that in pursuit of this goal, some intermediary functionalities were necessary to implement, for example code that converts between database languages and excel, and command line utilities processing queries into those databases.  These functionalities turned out to be important to other branches of Club as well, so some of their functionalities may be ported to different projects.  Details on this, the project's installation, and examples to get you started are below.
 
 ## Installing the prerequisites
-
-
-#### Windows
-**FIXME**
-
 #### Mac
 If you don't have `homebrew`, `git`, `pip`, or `python3` installed, copy and paste this into terminal (it may take a while).
 ```
@@ -117,3 +121,11 @@ csv_db.query("select * from test1", cursor, file_out="blah.csv")
    woot    wat?    hye 
    ow  ow  yah 
    ```
+
+## FAQ
+* [Basic SQL Statement Syntax and Concepts](https://www.w3schools.com/sql/sql_syntax.asp)
+* [Great PostgreSQL tutorial for different statements](http://www.postgresqltutorial.com/)
+* [PostgreSQL Command Line "Cheat Sheet"](https://gist.github.com/Kartones/dd3ff5ec5ea238d4c546)
+* Getting the error "column not found" when executing a SQL query?  Don't use capitalized column names in your excel sheets, or you'll have to turn your postgresql query from 
+`select A from one;` to `select "A" from one;`.  
+NOTE: double quotes are used for column or table names, single quotes are used for specific query strings.  e.g. `select "A" from one where name='bob';`.  More on that [here](https://stackoverflow.com/questions/41396195/what-is-the-difference-between-single-quotes-and-double-quotes-in-postgresql).

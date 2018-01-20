@@ -1,0 +1,102 @@
+update one
+set d=two.b,
+e = two.c
+from two
+where one.a = two.a
+returning one.a, one.b, one.c, one.d, one.e;
+
+
+
+
+
+Steps:
+merge info for matching dev_id's or first and last names - DONE
+    update alumni
+    set 
+    dev_id = dev_db.dev_id,
+    first=dev_db.first_name,
+    last=dev_db.last_name,
+    address=dev_db.address,
+    city=dev_db.city,
+    state=dev_db.state,
+    zip=dev_db.zip,
+    cell=dev_db.cell,
+    home=dev_db.home_phone,
+    email=dev_db.email
+    from dev_db
+    where alumni.dev_id = dev_db.dev_id or (alumni.first=dev_db.first_name and alumni.last = dev_db.last_name);
+
+
+
+insert names into alumni from dev that don't match with alumni
+    insert into one(a, b)
+    select two.a, two.b from
+    two left join one on
+    two.a = one.a
+    where one.a is NULL;
+
+
+    insert into alumni(dev_id, first, last, address, city, state, zip, cell, home, email)
+    select dev_db.dev_id, dev_db.first_name, dev_db.last_name, dev_db.address, dev_db.city, dev_db.state, dev_db.zip, dev_db.cell, dev_db.home_phone, dev_db.email
+    from
+    dev_db left join alumni on
+    dev_db.dev_id = alumni.dev_id
+    where alumni.dev_id is NULL;
+
+
+find alumni still missing: (write this to csv)
+    select * from alumni where dev_id is NULL;
+
+
+
+    TEST: print all alumni where dv_db.A = alumni.A and (alumni.B != dev_db.B || alumni.C != dev_db.C) -> should be nothing!
+        select alumni.dev_id from
+        alumni inner join dev_db on alumni.dev_id = dev_db.dev_id
+        where alumni.last <> dev_db.last_name;
+        update alumni where alumni.first = dev.first and alumni.last = dev.last
+
+
+RESULT 1: print count of alumni matched with dev
+    select count(alumni.dev_id) from alumni inner join dev_db on alumni.dev_id = dev_db.dev_id;
+
+    select count(*) from (select distinct * from alumni where last='Cole' or last='Collins') as x;
+
+    select count(*) from (select * from alumni where last='Cole' or last='Collins') as x;
+
+    select count(*) from alumni inner join dev_db on (alumni.last=dev_db.last_name) and (alumni.last='Cole' or alumni.last='Collins');
+
+    select * from alumni inner join dev_db on (alumni.last=dev_db.last_name) and (alumni.last='Cole' or alumni.last='Collins');
+
+    select distinct * from (select alumni.first, alumni.last from alumni inner join dev_db on (alumni.last=dev_db.last_name) and (alumni.last='Cole')) as x;
+
+
+RESULT 2: print count of alumni matched with dev again
+    select count(*) from alumni inner join dev_db on alumni.dev_id = dev_db.dev_id;
+
+
+TEST: RESULT 2 - RESULT 1 = merge info update count
+
+
+
+
+print all dev w/ same last name to see if there is crossover
+    select count(alumni.dev_id) from alumni inner join dev_db on (alumni.last = dev_db.last_name and alumni.dev_id != dev_db.dev_id);
+
+for all leftover in alumni that are not in dev, make separate csv, send to ellen aretakis to check
+
+insert all remaining dev into alumni
+
+
+
+// 
+
+1   one     1   two
+2   one     2   two
+3           3   two
+4
+5
+select * from one left join two on one.a=two.a;
+
+
+select * from one left join two on one.a=two.a where two.a is null;
+
