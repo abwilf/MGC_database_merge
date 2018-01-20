@@ -62,7 +62,7 @@ def gen_db(input_files=[], dbname="db", excel=False):
 
     # else (db exists), ask if they want to overwrite it with csvs or exit
     else:
-        s = input("\"" + dbname + "\" already exists.  Do you want to overwrite it with the csv's you entered? [y] or [n]\n")
+        s = input("\"" + dbname + "\" already exists.  Do you want to overwrite it with the files you entered? [y] or [n]\n")
         if s == 'n':
             print("\nExiting the program.  Next time around, either choose to overwrite the database or choose an unused database name.")
             print("Database names in use: ")

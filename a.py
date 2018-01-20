@@ -4,10 +4,11 @@ dbname = 'mydb'
 # cur = csv_db.gen_db(['alumni.xlsx', 'dev_db.xlsx'], dbname=dbname, excel=True)
 # csv_db.gen_db(['one.xlsx', 'two.xlsx'], dbname='heya', excel=True)
 cur = csv_db.connect(dbname)
+
 text = """
-select * from alumni where dev_id is NULL;
+select * from alumni;
 """
-csv_db.query(text, cur)
+csv_db.query(text, cur, file_out="alumni_new.csv")
 # text = """
 # update alumni
 # set first=dev_db.first_name,
