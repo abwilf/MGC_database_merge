@@ -81,6 +81,10 @@ def gen_db(input_files=[], dbname="db", excel=False):
     if excel:
         input_files = create_csvs(input_files)  
 
+    for x in input_files:
+        if '.xlsx' in x:
+            exit('ERROR: The files you enetered contain .xlsx. Maybe you meant to use the excel=True option of gen_db().  Please rewrite the function and rerun the code.')
+
     engine = create_engine('postgresql+psycopg2://postgres:postgres@localhost/' + dbname)
     for input_file in input_files:
         df = pd.read_csv(input_file)
@@ -112,26 +116,15 @@ def connect(dbname):
 # Effects: always returns results as python object for programmer
 #    if cmnd_line, returns results on command line
 #    else, prints results to file_out in csv format
-def query(text, cursor, print_out=True, cmnd_line=False, file_out="out.csv", result=True):
-    # if print_out and not cursor.description:
-    #     text_print = """ERROR: Problem in query function: you asked the function to print the results but you didn't give it a
-    #         SQL query that it could print something from.  Example: 'update one set a=4;'.
-    #         This doesn't return anything to print.  If you want to do this with an 'update'
-    #         statement, check out the SQL 'returning' statement online, or specify print_out=False\n\nExiting program now."""
-    #     exit(text_print)
+def query(text, cursor, print_out=True, cmnd_line=False, file_out="out.csv"):
     cursor.execute(text)
-    if result:
-        res = cursor.fetchall()
-
-    # tempres = []
-    # if res:
-    #     # fieldnames = list(res[0].keys())
-    #     # deal with byte encoding problem
-    #     for elt in res:
-    #         tempres.append({k: (v.decode('UTF-8') if type(v) == bytes else v) for k, v in elt.items()})
-    # res = tempres
+    result = not(not cursor.description)
+    if print_out and not result:
+        text_print = """ERROR: Problem in query function: you asked the function to print the results (print_out=True by default) but you didn't give it a SQL query that it could print something from.  Example: 'update one set a=4;'. This doesn't return anything to print.  If you want to do this with an 'update' statement, check out the SQL 'returning' statement online, or specify print_out=False\n\nExiting program now."""
+        exit(text_print)
 
     if print_out:
+        res = cursor.fetchall()
         colnames = [col.name for col in cursor.description]
         if cmnd_line:
             print('\n******* QUERY RESULT *******')
@@ -145,5 +138,4 @@ def query(text, cursor, print_out=True, cmnd_line=False, file_out="out.csv", res
                 print()
         else:
             write_to_csv([colnames] + res, file_out)
-    if result:
         return res

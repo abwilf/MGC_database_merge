@@ -17,30 +17,34 @@ Due to these constraints, we need a database that has the operational capability
 
 It is worth noting that in pursuit of this goal, some intermediary functionalities were necessary to implement, for example code that converts between database languages and excel, and command line utilities processing queries into those databases.  These functionalities turned out to be important to other branches of Club as well, so some of their functionalities may be ported to different projects.  Details on this, the project's installation, and examples to get you started are below.
 
-## Installing the prerequisites
-#### Mac
-If you don't have `homebrew`, `git`, `pip`, or `python3` installed, copy and paste this into terminal (it may take a while).
-```
+## Installing the prerequisites (Mac)
+```        
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 brew update
 brew install git
-brew install pip
 brew install python3
-```
-
-Now that the dependencies have been installed, copy and paste the following.  This copies the code base onto your computer and installs python packages required to run it.
-```
 cd ~/Desktop/
 git clone https://github.com/abwilf/MGC_database_merge.git
-pip install -r
-
+python3 -m venv env
+source env/bin/activate
+brew services start postgres
+pip3 install -r requirements.txt
+psql -U postgres
+create database mydb;
+create user postgres with superuser password 'password';
+\q
 ```
 
-
 ## Running the scripts
-
 ### Alumni Relations Manager
-**FIXME**
+Move the files `alumni.csv` and `dev_db.csv` into the `mgc_db_merge` directory.
+NOTE: It is important that you name the files exactly as they are named above.
+Copy and paste the following code into your terminal.
+
+```
+source env/bin/activate
+python3 alumni_script.py
+```
 
 ### Business Team
 To manage the inventory database, you'll need to access functions in `csv_db.py`.  The relevant functions you'll use are below.  For a full example, scroll down or [click here](https://github.com/abwilf/MGC_database_merge#full-example).
