@@ -37,9 +37,21 @@ create user postgres with superuser password 'password';
 
 ## Running the scripts
 ### Alumni Relations Manager
-Move the files `alumni.csv` and `dev_db.csv` into the `mgc_db_merge` directory.
-NOTE: It is important that you name the files exactly as they are named above.
+Ask development to send you a spreadsheet in excel format - `.xlsx` - with the following columns:
+
+`dev_id, title, first, last, no_contact, no_solicitation, no_email, email, address, city, state, zip, home, cell`
+
+Clean up the file they send you by naming it `dev.xlsx` and changing the column names to match the ones above.  It does not matter if there are extra columns, but the spreadsheet must have the columns above named properly to work.  The colors of the spreadsheet don't affect the program's performance.
+
+Move the files `alumni.xlsx` and `dev.xlsx` into the `mgc_db_merge` folder.
+
+NOTE: It is important that you name the files exactly as they are named above.  You can also name them `alumni.csv` and `dev.csv`, but you will need to type `#` at the beginning of line 3 of `alumni_script.py`, delete the `#` at the beginning of line 4, and save the file before you run the program.  If you don't have a coding text editor, I would just convert the files from `.csv` to `.xlsx`.
+
 Copy and paste the following code into your terminal.
+
+The new database is in the file `alumni_new.csv`
+
+Change the name of `alumni_new.csv` to `alumni.csv` and reupload it to the Alumni Google Drive so the rest of the team has an updated copy.
 
 ```
 source env/bin/activate
@@ -133,3 +145,4 @@ csv_db.query("select * from test1", cursor, file_out="blah.csv")
 * Getting the error "column not found" when executing a SQL query?  Don't use capitalized column names in your excel sheets, or you'll have to turn your postgresql query from 
 `select A from one;` to `select "A" from one;`.  
 NOTE: double quotes are used for column or table names, single quotes are used for specific query strings.  e.g. `select "A" from one where name='bob';`.  More on that [here](https://stackoverflow.com/questions/41396195/what-is-the-difference-between-single-quotes-and-double-quotes-in-postgresql).
+* If you see this error: `pandas.errors.EmptyDataError: No columns to parse from file`, you may have tried to specify a filename with a path (ex: `files/alumni.xlsx`) in your `csv_db.gen_db()` function.  That function doesn't support file paths at this moment.  If there's demand, let me know and I'll add it.

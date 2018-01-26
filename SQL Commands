@@ -100,3 +100,58 @@ select * from one left join two on one.a=two.a;
 
 select * from one left join two on one.a=two.a where two.a is null;
 
+
+
+
+
+
+
+
+update alumni
+set 
+dev_id = dev_db.dev_id,
+first=dev_db.first_name,
+last=dev_db.last_name,
+address=dev_db.address,
+city=dev_db.city,
+state=dev_db.state,
+zip=dev_db.zip,
+cell=dev_db.cell,
+home=dev_db.home_phone,
+email=dev_db.email
+from dev_db
+where alumni.dev_id = dev_db.dev_id or (alumni.first=dev_db.first_name and alumni.last = dev_db.last_name);
+
+
+
+
+
+# NO DEV_DB anymore
+
+# set everything except cell and email from dev
+update alumni
+set 
+dev_id = dev.dev_id,
+first=dev.first,
+last=dev.last,
+address=dev.address,
+city=dev.city,
+state=dev.state,
+zip=dev.zip,
+home=dev.home,
+no_contact=dev.no_contact,
+no_solicitation=dev.no_solicitation,
+no_email=dev.no_email
+from dev
+where alumni.dev_id = dev.dev_id or (alumni.first=dev.first_name and alumni.last = dev.last_name);
+
+
+# set email except where dirty bit set
+update alumni
+set
+email=dev.email
+from dev
+where alumni.dev_id = dev.dev_id and alumni.email_dirty_bit !=1
+
+# set phone except where dirty bit set
+

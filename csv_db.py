@@ -39,11 +39,11 @@ def gen_db(input_files=[], dbname="db", excel=False):
     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     cur = conn.cursor()
     text = "select exists(SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('" + dbname + "'));"
-    db_exists = query(text, cur, print_out=False)[0][0]
+    db_exists = query(text, cur)
 
     # if not db, ask and create or exit
     if not db_exists:
-        dbs = [x[0] for x in query("select datname from pg_catalog.pg_database", cur, print_out=False)]
+        dbs = [x[0] for x in query("select datname from pg_catalog.pg_database", cur)]
         input_text = "*** NOTE ***\nYou're trying to connect to a database called \""+ dbname + "\", which does not exist.\n"
         input_text +=  "The following databases exist on your system: "
         for x in dbs:
@@ -66,7 +66,7 @@ def gen_db(input_files=[], dbname="db", excel=False):
         if s == 'n':
             print("\nExiting the program.  Next time around, either choose to overwrite the database or choose an unused database name.")
             print("Database names in use: ")
-            for x in query("select datname from pg_catalog.pg_database", cur, print_out=False):
+            for x in query("select datname from pg_catalog.pg_database", cur):
                 print(x[0], end="\t")
             print()
             exit()
@@ -116,14 +116,14 @@ def connect(dbname):
 # Effects: always returns results as python object for programmer
 #    if cmnd_line, returns results on command line
 #    else, prints results to file_out in csv format
-def query(text, cursor, print_out=True, cmnd_line=False, file_out="out.csv"):
+def query(text, cursor, res=True, cmnd_line=False, csv=False, file_out="out.csv"):
     cursor.execute(text)
     result = not(not cursor.description)
-    if print_out and not result:
-        text_print = """ERROR: Problem in query function: you asked the function to print the results (print_out=True by default) but you didn't give it a SQL query that it could print something from.  Example: 'update one set a=4;'. This doesn't return anything to print.  If you want to do this with an 'update' statement, check out the SQL 'returning' statement online, or specify print_out=False\n\nExiting program now."""
+    if res and not result:
+        text_print = """ERROR: Problem in query function: you asked the function to print the results (res=True by default) but you didn't give it a SQL query that it could print something from.  Example: 'update one set a=4;'. This doesn't return anything to print.  If you want to do this with an 'update' statement, check out the SQL 'returning' statement online, or specify res=False\n\nExiting program now."""
         exit(text_print)
 
-    if print_out:
+    if res:
         res = cursor.fetchall()
         colnames = [col.name for col in cursor.description]
         if cmnd_line:
@@ -136,6 +136,6 @@ def query(text, cursor, print_out=True, cmnd_line=False, file_out="out.csv"):
                 for sub_elt in elt:
                     print(sub_elt, end="\t")
                 print()
-        else:
+        if csv:
             write_to_csv([colnames] + res, file_out)
         return res
