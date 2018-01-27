@@ -41,7 +41,7 @@ create user postgres with superuser password 'password';
 
    `dev_id, title, first, last, no_contact, no_solicitation, no_email, email, address, city, state, zip, home, cell`
 
-2. Clean up the file they send you by naming it `dev.xlsx` and changing the column names to match the ones above.  It doesn't matter if there are extra columns, but the spreadsheet **must have the columns above named properly to work**.  The colors of the spreadsheet don't affect the program's performance.
+2. Clean up the file they send you by naming it `dev.xlsx` and changing the column names to match the ones above.  It doesn't matter if there are extra columns, but the spreadsheet **must have the columns above named properly to work**.  Specifically, there cannot be any capital letters, or the program will not function as expected.  The colors of the spreadsheet don't affect the program's performance.
 
 3. Move the files `alumni.xlsx` and `dev.xlsx` into the `mgc_db_merge` folder, overwriting files if necessary.
 

@@ -41,7 +41,7 @@ def gen_db(input_files=[], dbname="db", excel=False):
     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     cur = conn.cursor()
     text = "select exists(SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('" + dbname + "'));"
-    db_exists = query(text, cur)
+    db_exists = query(text, cur)[0][0]
 
     # if not db, ask and create or exit
     if not db_exists:
