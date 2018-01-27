@@ -22,18 +22,20 @@ def create_csvs(input_files):
     return to_ret
 
 
-def create_db(dbname, conn):
+def create_db(dbname, conn, cur):
     print("Creating database \""+dbname+"\"")
     text = "create database " + dbname
-    cur = conn.cursor()
     cur.execute(text)
+    cur.close()
+    conn.close()
     conn = psycopg2.connect(host="localhost",database=dbname, user="postgres", password="postgres")
     cur = conn.cursor()
-    return cur
+    return cur, conn
 
 
-# R: array of input_files = [<filename>.csv], dbname (optional), if files being inputted are in xlsx format or not
-# E: returns db cursor with dbname, having incorporated input files to db with <filename> as table name
+# Requires: array of input_files = [<filename>.csv], dbname (optional)
+#       excel= if files being inputted are in xlsx format or not (all must be in same format)
+# Effects: returns db cursor with dbname, having incorporated input files to db with <filename> as table name
 def gen_db(input_files=[], dbname="db", excel=False):    
     conn = psycopg2.connect(host="localhost", user="postgres", password="postgres")
     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
@@ -58,7 +60,7 @@ def gen_db(input_files=[], dbname="db", excel=False):
         else: # create db
             # testing
             # print("SHOULD BE FALSE: " + query("select exists(SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('" + dbname + "'));", cur, print_out=False)[0][0])
-            cur = create_db(dbname, conn)
+            cur, conn = create_db(dbname, conn, cur)
 
     # else (db exists), ask if they want to overwrite it with csvs or exit
     else:
@@ -74,7 +76,7 @@ def gen_db(input_files=[], dbname="db", excel=False):
             # drop and regenerate database
             print("Dropping database \"" + dbname + "\"")
             cur.execute("drop database if exists " + dbname)
-            cur = create_db(dbname, conn)
+            cur, conn = create_db(dbname, conn, cur)
     
     # populate db with csvs using pandas
     print("Populating database from csv files...")
@@ -91,31 +93,37 @@ def gen_db(input_files=[], dbname="db", excel=False):
         df.to_sql(input_file.split('.')[0], engine)
 
     print("Done")
-    return cur
+    return cur, conn
 
 
 def write_to_csv(rows, filename):
     with open(filename, 'w') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerows(rows)
+    print("Result is in", filename)
 
 # Requires: dbname must be a database in postgres on this machine, postgres must be running (brew services start postgres),
 # must have user and superuser privileges for postgres, postgres == (username, password)
-# Effects: returns cursor connected to postgreSQL database <dbname>
+# Effects: returns cursor and connection objects connected to postgreSQL database <dbname>
 def connect(dbname):
-    return psycopg2.connect(host="localhost", database=dbname, user="postgres", password="postgres").cursor()
+    conn = psycopg2.connect(host="localhost", database=dbname, user="postgres", password="postgres")
+    cur = conn.cursor()
+    return cur, conn
 
-# Requires: query text (in SQL format)
-#    database cursor (the return value of gen_db)
-#    print: do you want it to print anything (to csv or command line?) Default=True
-#    cmnd_line: do you want it to print to the command line? True or False. By default the function prints results to a csv
-#    file_out: If not printing to command line, specify the filename you would like to write to - defaults to "out.csv"
+# Requires: query text (in postgreSQL format)
+#    database cursor (one of the return values of gen_db)
+#    res: Does this query return anything?  e.g. "select * from alumni" returns something, but 
+#       "update alumni set name='hey'" doesn't. Defaults to True.
+#    cmnd_line: if the query returns a result, do you want it to print to the command line? Defaults to False.
+#    csv: if the query returns a result, do you want it to print the result to a csv? Defaults to False.
+#    file_out: if (csv): specify the filename you would like to write to - defaults to "out.csv".
 #
 # Modifies: db (wherever cursor is connected)
 #
-# Effects: always returns results as python object for programmer
-#    if cmnd_line, returns results on command line
-#    else, prints results to file_out in csv format
+# Effects: queries database
+#    if (res): returns results as python object for programmer
+#    if cmnd_line, prints results on command line
+#    if csv, prints results to file_out in csv format
 def query(text, cursor, res=True, cmnd_line=False, csv=False, file_out="out.csv"):
     cursor.execute(text)
     result = not(not cursor.description)
@@ -139,3 +147,11 @@ def query(text, cursor, res=True, cmnd_line=False, csv=False, file_out="out.csv"
         if csv:
             write_to_csv([colnames] + res, file_out)
         return res
+
+# R: valid cursor and connection objects connected to postgreSQL databases
+# M: commits changes executed by cur on db
+# E: closes connection, commits changes.  MUST call this function at end of code
+def end(cur, conn):
+    conn.commit()
+    cur.close()
+    conn.close()

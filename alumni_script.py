@@ -1,10 +1,10 @@
 import csv_db
 dbname = 'mydb'
-cur = csv_db.gen_db(['alumni.xlsx', 'dev.xlsx'], dbname=dbname, excel=True)
-# cur = csv_db.gen_db(['alumni.csv', 'dev.csv'], dbname=dbname) 
-# cur = csv_db.connect(dbname)
+cur, conn = csv_db.gen_db(['alumni.xlsx', 'dev.xlsx'], dbname=dbname, excel=True)
+# cur, conn = csv_db.gen_db(['alumni.csv', 'dev.csv'], dbname=dbname) 
+# cur, conn = csv_db.connect(dbname)
 
-# set everything except email and cell
+# set everything except email and cell (find alums with matching first names first, then dev_id)
 q = """
 update alumni
 set 
@@ -24,7 +24,7 @@ from dev
 where alumni.first=dev.first and alumni.last = dev.last
 returning alumni.dev_id, alumni.first, alumni.last;
 """
-updated_arr = csv_db.query(q, cur)
+csv_db.query(q, cur)
 
 q = """
 update alumni
@@ -45,7 +45,7 @@ from dev
 where alumni.dev_id = dev.dev_id
 returning alumni.dev_id, alumni.first, alumni.last;
 """
-updated_arr = csv_db.query(q, cur)
+csv_db.query(q, cur)
 
 # set email
 q = """update alumni
@@ -55,7 +55,7 @@ from dev
 where alumni.dev_id = dev.dev_id and alumni.email_dirty_bit != TRUE
 returning alumni.dev_id, alumni.first, alumni.last;
 """
-updated_arr += csv_db.query(q, cur)
+csv_db.query(q, cur)
 
 # set cell phone
 q = """update alumni
@@ -65,7 +65,8 @@ from dev
 where alumni.dev_id = dev.dev_id and alumni.cell_dirty_bit != TRUE
 returning alumni.dev_id, alumni.first, alumni.last;
 """
-updated_arr += csv_db.query(q, cur)
+csv_db.query(q, cur)
 
 
 csv_db.query("select * from alumni", cur, csv=True, file_out="alumni_new.csv")
+csv_db.end(cur, conn)
