@@ -25,8 +25,10 @@ brew install git
 brew install python3
 cd ~/Desktop/
 git clone https://github.com/abwilf/MGC_database_merge.git
+cd MGC_database_merge/
 python3 -m venv env
 source env/bin/activate
+brew install postgres
 brew services start postgres
 pip3 install -r requirements.txt
 psql -U postgres
