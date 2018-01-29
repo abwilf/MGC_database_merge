@@ -18,6 +18,7 @@ Due to these constraints, we need a database that has the operational capability
 It is worth noting that in pursuit of this goal, some intermediary functionalities were necessary to implement, for example code that converts between database languages and excel, and command line utilities processing queries into those databases.  These functionalities turned out to be important to other branches of Club as well, so some of their functionalities may be ported to different projects.  Details on this, the project's installation, and examples to get you started are below.
 
 ## Installing the prerequisites (Mac)
+Note: this may up to 5-10 minutes the first time, and it may ask you to enter your password.
 ```        
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 brew update
@@ -28,11 +29,12 @@ git clone https://github.com/abwilf/MGC_database_merge.git
 cd MGC_database_merge/
 python3 -m venv env
 source env/bin/activate
-brew install postgres
-brew services start postgres
 pip3 install -r requirements.txt
-psql -U postgres
-create database mydb;
+brew install postgres
+initdb /usr/local/var/postgres
+brew services start postgresql
+createdb mydb;
+psql mydb
 create user postgres with superuser password 'password';
 \q
 ```
