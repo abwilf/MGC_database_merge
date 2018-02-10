@@ -6,3 +6,5 @@ blah/*
 files/*
 blah*
 MONICA*
+.gitignore
+__pycache__
