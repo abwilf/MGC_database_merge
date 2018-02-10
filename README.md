@@ -65,6 +65,15 @@ The new database is in the file `alumni_new.csv`
 ### Business Team
 To manage the inventory database, you'll need to access functions in `csv_db.py`.  The relevant functions you'll use are below.  For a full example, see [`alumni_script.py`](https://github.com/abwilf/MGC_database_merge/blob/master/alumni_script.py), or [a simpler example in this document](https://github.com/abwilf/MGC_database_merge#full-example).
 
+Before you execute any code, remember to fire up the virtual environment.
+
+#### Running the starter code (you may want to modify this)
+```
+source env/bin/activate
+python3 bus_script.py
+```
+
+
 #### Generate Database
 ```python
 # Requires: array of input_files = [<filename>.csv], dbname (optional)
@@ -169,7 +178,7 @@ def end(cur, conn):
    More on this in the bullet points below, but here's a short tutorial
    1. Pop open a terminal shell
    2. run `psql -U postgres` to connect to your server
-   3. enter `\lt` to see the list of databases
+   3. enter `\l` to see the list of databases
    4. enter `\q` to quit, `psql <db_name>` to access that database directly
    5. run `\dt` to see what tables you have
    6. execute any queries you'd like
